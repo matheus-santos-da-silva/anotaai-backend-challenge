@@ -3,6 +3,7 @@ import { CategoriesRepository } from '../../repositories/categories/categories-r
 import { CategoriesServiceProtocol } from './protocols/categories-service-protocol';
 import { Category } from '../../domain/category/category.entity';
 import { CreateCategoryDTO } from '../../domain/category/dtos/create-category-dto';
+import { UpdateCategoryDTO } from '../../domain/category/dtos/update-category-dto';
 
 @Injectable()
 export class CategoriesService implements CategoriesServiceProtocol {
@@ -12,6 +13,12 @@ export class CategoriesService implements CategoriesServiceProtocol {
     const category = await this.categoriesRepository.getById(id);
     if (!category) throw new NotFoundException('Category was not found');
     return category;
+  }
+
+  async update(id: string, data: UpdateCategoryDTO): Promise<Category> {
+    await this.getById(id);
+    const updatedCategory = await this.categoriesRepository.update(id, data);
+    return updatedCategory;
   }
 
   async getAll(): Promise<Category[]> {
