@@ -12,6 +12,11 @@ export class CategoriesRepository implements CategoriesRepositoryProtocol {
     private readonly typeOrmRepository: Repository<Category>,
   ) {}
 
+  async getById(id: string): Promise<Category> {
+    const category = await this.typeOrmRepository.findOne({ where: { id } });
+    return category;
+  }
+
   async getAll(): Promise<Category[]> {
     const categories = await this.typeOrmRepository.find();
     return categories;
