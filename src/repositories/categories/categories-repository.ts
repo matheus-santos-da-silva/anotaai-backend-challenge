@@ -13,6 +13,10 @@ export class CategoriesRepository implements CategoriesRepositoryProtocol {
     private readonly typeOrmRepository: Repository<Category>,
   ) {}
 
+  async delete(id: string): Promise<void> {
+    await this.typeOrmRepository.delete(id);
+  }
+
   async getById(id: string): Promise<Category> {
     const category = await this.typeOrmRepository.findOne({ where: { id } });
     return category;

@@ -15,6 +15,11 @@ export class CategoriesService implements CategoriesServiceProtocol {
     return category;
   }
 
+  async delete(id: string): Promise<void> {
+    await this.getById(id);
+    await this.categoriesRepository.delete(id);
+  }
+
   async update(id: string, data: UpdateCategoryDTO): Promise<Category> {
     await this.getById(id);
     const updatedCategory = await this.categoriesRepository.update(id, data);

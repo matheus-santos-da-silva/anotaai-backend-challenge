@@ -7,4 +7,5 @@ export abstract class CategoriesServiceProtocol {
   abstract getAll(): Promise<Category[]>;
   abstract getById(id: string): Promise<Category>;
   abstract update(id: string, data: UpdateCategoryDTO): Promise<Category>;
+  abstract delete(id: string): Promise<void>;
 }
