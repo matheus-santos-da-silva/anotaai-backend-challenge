@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DATABASE_URL } from './env';
+import { CategoriesModule } from './modules/categories.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { DATABASE_URL } from './env';
       migrations: [`${__dirname}/infra/database/migrations/{.ts,*.js}`],
       migrationsRun: true,
     }),
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],
