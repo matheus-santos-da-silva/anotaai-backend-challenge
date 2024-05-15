@@ -19,6 +19,11 @@ export class ProductsService implements ProductsServiceProtocol {
     return product;
   }
 
+  async delete(id: string): Promise<void> {
+    await this.getById(id);
+    await this.productsRepository.delete(id);
+  }
+
   async update(id: string, data: UpdateProductDTO): Promise<Product> {
     await this.getById(id);
     await this.categoriesService.getById(data.categoryId);

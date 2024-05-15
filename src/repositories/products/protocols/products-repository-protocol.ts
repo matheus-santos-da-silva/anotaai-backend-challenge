@@ -7,4 +7,5 @@ export abstract class ProductsRepositoryProtocol {
   abstract getAll(): Promise<Product[]>;
   abstract getById(id: string): Promise<Product>;
   abstract update(id: string, data: UpdateProductDTO): Promise<Product>;
+  abstract delete(id: string): Promise<void>;
 }

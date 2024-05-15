@@ -13,6 +13,10 @@ export class ProductsRepository implements ProductsRepositoryProtocol {
     private readonly typeOrmRepository: Repository<Product>,
   ) {}
 
+  async delete(id: string): Promise<void> {
+    await this.typeOrmRepository.delete(id);
+  }
+
   async update(id: string, data: UpdateProductDTO): Promise<Product> {
     await this.typeOrmRepository.update(id, data);
     const updatedProduct = await this.typeOrmRepository.findOne({
