@@ -4,6 +4,7 @@ import { CreateProductDTO } from '../../domain/product/dtos/create-product-dto';
 import { Product } from '../../domain/product/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateProductDTO } from 'src/domain/product/dtos/update-product-dto';
 
 @Injectable()
 export class ProductsRepository implements ProductsRepositoryProtocol {
@@ -11,6 +12,14 @@ export class ProductsRepository implements ProductsRepositoryProtocol {
     @InjectRepository(Product)
     private readonly typeOrmRepository: Repository<Product>,
   ) {}
+
+  async update(id: string, data: UpdateProductDTO): Promise<Product> {
+    await this.typeOrmRepository.update(id, data);
+    const updatedProduct = await this.typeOrmRepository.findOne({
+      where: { id },
+    });
+    return updatedProduct;
+  }
 
   async getById(id: string): Promise<Product> {
     const product = await this.typeOrmRepository.findOne({ where: { id } });

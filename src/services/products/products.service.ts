@@ -4,6 +4,7 @@ import { CreateProductDTO } from '../../domain/product/dtos/create-product-dto';
 import { Product } from '../../domain/product/product.entity';
 import { ProductsRepository } from '../../repositories/products/products-repository';
 import { CategoriesService } from '../categories/categories.service';
+import { UpdateProductDTO } from 'src/domain/product/dtos/update-product-dto';
 
 @Injectable()
 export class ProductsService implements ProductsServiceProtocol {
@@ -15,6 +16,13 @@ export class ProductsService implements ProductsServiceProtocol {
   async getById(id: string): Promise<Product> {
     const product = await this.productsRepository.getById(id);
     if (!product) throw new NotFoundException('Product was not found');
+    return product;
+  }
+
+  async update(id: string, data: UpdateProductDTO): Promise<Product> {
+    await this.getById(id);
+    await this.categoriesService.getById(data.categoryId);
+    const product = await this.productsRepository.update(id, data);
     return product;
   }
 
