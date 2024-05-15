@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DATABASE_URL } from './env';
 import { CategoriesModule } from './modules/categories.module';
+import { ProductsModule } from './modules/products.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CategoriesModule } from './modules/categories.module';
       migrationsRun: true,
     }),
     CategoriesModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
