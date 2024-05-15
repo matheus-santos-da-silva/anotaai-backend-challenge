@@ -3,4 +3,5 @@ import { Product } from '../../../domain/product/product.entity';
 
 export abstract class ProductsRepositoryProtocol {
   abstract create(data: CreateProductDTO): Promise<Product>;
+  abstract getAll(): Promise<Product[]>;
 }

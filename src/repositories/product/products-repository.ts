@@ -12,6 +12,11 @@ export class ProductsRepository implements ProductsRepositoryProtocol {
     private readonly typeOrmRepository: Repository<Product>,
   ) {}
 
+  async getAll(): Promise<Product[]> {
+    const products = await this.typeOrmRepository.find({});
+    return products;
+  }
+
   async create(data: CreateProductDTO): Promise<Product> {
     const product = await this.typeOrmRepository.save(data);
     return product;

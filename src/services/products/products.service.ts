@@ -12,6 +12,11 @@ export class ProductsService implements ProductsServiceProtocol {
     private readonly categoriesService: CategoriesService,
   ) {}
 
+  async getAll(): Promise<Product[]> {
+    const products = await this.productsRepository.getAll();
+    return products;
+  }
+
   async create(data: CreateProductDTO): Promise<Product> {
     await this.categoriesService.getById(data.categoryId);
     const product = await this.productsRepository.create(data);
