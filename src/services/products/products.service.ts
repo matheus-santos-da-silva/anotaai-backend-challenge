@@ -23,8 +23,16 @@ export class ProductsService implements ProductsServiceProtocol {
   }
 
   async delete(id: string): Promise<void> {
-    await this.getById(id);
+    const product = await this.getById(id);
     await this.productsRepository.delete(id);
+    await this.awsSnsService.publishMessage({
+      message: JSON.stringify({
+        type: 'delete-product',
+        ownerId: product.ownerId,
+        productId: id,
+      }),
+      topicArn: AWS_SNS_TOPIC_ARN,
+    });
   }
 
   async update(id: string, data: UpdateProductDTO): Promise<Product> {

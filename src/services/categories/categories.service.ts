@@ -21,8 +21,16 @@ export class CategoriesService implements CategoriesServiceProtocol {
   }
 
   async delete(id: string): Promise<void> {
-    await this.getById(id);
+    const category = await this.getById(id);
     await this.categoriesRepository.delete(id);
+    await this.awsSnsService.publishMessage({
+      message: JSON.stringify({
+        type: 'delete-category',
+        ownerId: category.ownerId,
+        categoryId: id,
+      }),
+      topicArn: AWS_SNS_TOPIC_ARN,
+    });
   }
 
   async update(id: string, data: UpdateCategoryDTO): Promise<Category> {
