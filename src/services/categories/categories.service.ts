@@ -4,10 +4,15 @@ import { CategoriesServiceProtocol } from './protocols/categories-service-protoc
 import { Category } from '../../domain/category/category.entity';
 import { CreateCategoryDTO } from '../../domain/category/dtos/create-category-dto';
 import { UpdateCategoryDTO } from '../../domain/category/dtos/update-category-dto';
+import { AwsSnsService } from '../aws/aws-sns.service';
+import { AWS_SNS_TOPIC_ARN } from '../../env';
 
 @Injectable()
 export class CategoriesService implements CategoriesServiceProtocol {
-  constructor(private readonly categoriesRepository: CategoriesRepository) {}
+  constructor(
+    private readonly categoriesRepository: CategoriesRepository,
+    private readonly awsSnsService: AwsSnsService,
+  ) {}
 
   async getById(id: string): Promise<Category> {
     const category = await this.categoriesRepository.getById(id);
@@ -23,6 +28,10 @@ export class CategoriesService implements CategoriesServiceProtocol {
   async update(id: string, data: UpdateCategoryDTO): Promise<Category> {
     await this.getById(id);
     const updatedCategory = await this.categoriesRepository.update(id, data);
+    await this.awsSnsService.publishMessage({
+      message: JSON.stringify({ type: 'category', ...updatedCategory }),
+      topicArn: AWS_SNS_TOPIC_ARN,
+    });
     return updatedCategory;
   }
 
@@ -33,6 +42,10 @@ export class CategoriesService implements CategoriesServiceProtocol {
 
   async create(data: CreateCategoryDTO): Promise<Category> {
     const category = await this.categoriesRepository.create(data);
+    await this.awsSnsService.publishMessage({
+      message: JSON.stringify({ type: 'category', ...category }),
+      topicArn: AWS_SNS_TOPIC_ARN,
+    });
     return category;
   }
 }

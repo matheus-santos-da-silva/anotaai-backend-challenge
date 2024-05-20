@@ -5,12 +5,15 @@ import { Product } from '../../domain/product/product.entity';
 import { ProductsRepository } from '../../repositories/products/products-repository';
 import { CategoriesService } from '../categories/categories.service';
 import { UpdateProductDTO } from 'src/domain/product/dtos/update-product-dto';
+import { AwsSnsService } from '../aws/aws-sns.service';
+import { AWS_SNS_TOPIC_ARN } from 'src/env';
 
 @Injectable()
 export class ProductsService implements ProductsServiceProtocol {
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly categoriesService: CategoriesService,
+    private readonly awsSnsService: AwsSnsService,
   ) {}
 
   async getById(id: string): Promise<Product> {
@@ -28,6 +31,10 @@ export class ProductsService implements ProductsServiceProtocol {
     await this.getById(id);
     await this.categoriesService.getById(data.categoryId);
     const product = await this.productsRepository.update(id, data);
+    await this.awsSnsService.publishMessage({
+      message: JSON.stringify({ type: 'product', ...product }),
+      topicArn: AWS_SNS_TOPIC_ARN,
+    });
     return product;
   }
 
@@ -39,6 +46,10 @@ export class ProductsService implements ProductsServiceProtocol {
   async create(data: CreateProductDTO): Promise<Product> {
     await this.categoriesService.getById(data.categoryId);
     const product = await this.productsRepository.create(data);
+    await this.awsSnsService.publishMessage({
+      message: JSON.stringify({ type: 'product', ...product }),
+      topicArn: AWS_SNS_TOPIC_ARN,
+    });
     return product;
   }
 }
