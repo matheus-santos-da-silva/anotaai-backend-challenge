@@ -5,6 +5,7 @@ import { CategoriesRepository } from '../../repositories/categories/categories-r
 import { AWSSERVICEINMEMORY } from '../in-memory-repositories/aws-service-in-memory';
 import { CategoryMock } from '../mocks/category.mock';
 import { Category } from '../../domain/category/category.entity';
+import { NotFoundException } from '@nestjs/common';
 
 const categoryList: Category[] = [CategoryMock, CategoryMock, CategoryMock];
 
@@ -20,6 +21,7 @@ describe('Categories Service', () => {
           useValue: {
             create: jest.fn().mockReturnValue(CategoryMock),
             getAll: jest.fn().mockReturnValue(categoryList),
+            getById: jest.fn().mockReturnValue(CategoryMock)
           },
         },
         {
@@ -47,6 +49,18 @@ describe('Categories Service', () => {
     it('should return a categories list', async () => {
       const categories = await categoriesService.getAll();
       expect(categories).toEqual(categoryList);
+    });
+  });
+
+  describe('getById', () => {
+    it('should return a category', async () => {
+      const category = await categoriesService.getById('1');
+      expect(category).toEqual(CategoryMock);
+    });
+
+    it('should not return a category', () => {
+      jest.spyOn(categoriesService, 'getById').mockRejectedValue(new NotFoundException('Category was not found'));
+      expect(categoriesService.getById('not-existent-id')).rejects.toThrow('Category was not found');
     });
   });
 });
