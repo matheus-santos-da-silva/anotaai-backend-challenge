@@ -3,9 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AwsSnsService } from '../../services/aws/aws-sns.service';
 import { CategoriesRepository } from '../../repositories/categories/categories-repository';
 import { AWSSERVICEINMEMORY } from '../in-memory-repositories/aws-service-in-memory';
-import { CategoryMock } from '../mocks/category.mock';
+import { CategoryMock, UpdatedCategoryMock } from '../mocks/category.mock';
 import { Category } from '../../domain/category/category.entity';
 import { NotFoundException } from '@nestjs/common';
+import { CategoriesInMemoryRepository } from '../in-memory-repositories/categories-in-memory-repository';
 
 const categoryList: Category[] = [CategoryMock, CategoryMock, CategoryMock];
 
@@ -21,7 +22,9 @@ describe('Categories Service', () => {
           useValue: {
             create: jest.fn().mockReturnValue(CategoryMock),
             getAll: jest.fn().mockReturnValue(categoryList),
-            getById: jest.fn().mockReturnValue(CategoryMock)
+            update: jest.fn().mockReturnValue(UpdatedCategoryMock),
+            getById: jest.fn().mockReturnValue(CategoryMock),
+            delete: jest.fn().mockReturnValue(null),
           },
         },
         {
@@ -59,8 +62,51 @@ describe('Categories Service', () => {
     });
 
     it('should not return a category', () => {
-      jest.spyOn(categoriesService, 'getById').mockRejectedValue(new NotFoundException('Category was not found'));
-      expect(categoriesService.getById('not-existent-id')).rejects.toThrow('Category was not found');
+      jest
+        .spyOn(categoriesService, 'getById')
+        .mockRejectedValue(new NotFoundException('Category was not found'));
+      expect(categoriesService.getById('not-existent-id')).rejects.toThrow(
+        'Category was not found',
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should return a updated category', async () => {
+      const category = await categoriesService.create(CategoryMock);
+      expect(
+        categoriesService.update(category.id, UpdatedCategoryMock),
+      ).resolves.toEqual(UpdatedCategoryMock);
+    });
+
+    it('should return a error if the id do not exists', async () => {
+      jest
+        .spyOn(categoriesService, 'getById')
+        .mockRejectedValue(new NotFoundException('Category was not found'));
+
+      expect(
+        categoriesService.update('undefined-id', UpdatedCategoryMock),
+      ).rejects.toThrow('Category was not found');
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a category', async () => {
+      await categoriesService.create(CategoryMock);
+
+      expect(
+        categoriesService.delete(CategoryMock.id),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should return a error if the id do not exists', () => {
+      jest
+        .spyOn(categoriesService, 'getById')
+        .mockRejectedValue(new NotFoundException('Category was not found'));
+
+      expect(categoriesService.delete(CategoryMock.id)).rejects.toThrow(
+        'Category was not found',
+      );
     });
   });
 });
